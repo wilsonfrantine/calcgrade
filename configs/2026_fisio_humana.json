@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "id": "2026_fisio_humana",
+  "course": "Fisiologia Humana",
+  "configurationNumber": "39648",
+  "scale": {
+    "min": 0,
+    "max": 100
+  },
+  "calculation": {
+    "type": "weighted_mean",
+    "normalizeWeights": true,
+    "criticalThreshold": 40,
+    "passingThreshold": 70
+  },
+  "exampleGrades": [80, 75, 90, 65, 100],
+  "fields": [
+    {
+      "id": "p1",
+      "type": "Prova",
+      "abbreviation": "P1",
+      "description": "Avaliação 1",
+      "max": 100,
+      "weight": 30
+    },
+    {
+      "id": "p2",
+      "type": "Prova",
+      "abbreviation": "P2",
+      "description": "Avaliação 2",
+      "max": 100,
+      "weight": 30
+    },
+    {
+      "id": "p3",
+      "type": "Prova",
+      "abbreviation": "P3",
+      "description": "Circulatório",
+      "date": "28/09/2026",
+      "max": 100,
+      "weight": 14
+    },
+    {
+      "id": "p4",
+      "type": "Prova",
+      "abbreviation": "P4",
+      "description": "Respiratório",
+      "date": "13/10/2026",
+      "max": 100,
+      "weight": 13
+    },
+    {
+      "id": "a5",
+      "type": "Trabalho",
+      "abbreviation": "A5",
+      "description": "Excretor e Digestório",
+      "date": "02/11/2026",
+      "max": 100,
+      "weight": 13
+    }
+  ]
+}
