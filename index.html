@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f7f8fa">
+<title>Média ponderada · Genética Molecular</title>
+<style>
+:root{--bg:#f7f8fa;--card:#fff;--ink:#202735;--muted:#737d8c;--line:#e7eaf0;--blue:#3559d8;--bluebg:#eef2ff;--green:#187653}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+main{width:min(100% - 24px,860px);margin:0 auto;padding:20px 0 26px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+h1{font-size:clamp(19px,3vw,25px);letter-spacing:-.045em;margin:0;font-weight:780}
+.sub{font-size:12px;color:var(--muted);margin-top:3px}
+.tag{font-size:11px;color:var(--muted);border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 8px;white-space:nowrap}
+.summary{display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,.42fr);gap:9px;margin-bottom:12px}
+.metric{padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:13px;min-width:0}
+.metric.primary{background:var(--bluebg);border-color:#dfe5ff}
+.kicker{font-size:11px;color:var(--muted);font-weight:650}
+.value{font-size:clamp(19px,4vw,27px);font-weight:800;letter-spacing:-.045em;margin-top:2px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.primary .value{color:var(--blue)}
+.caption{font-size:11px;color:var(--muted);margin-top:2px}
+.sheet{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.sheet-head,.assessment{display:grid;grid-template-columns:minmax(0,1fr) minmax(100px,.55fr) minmax(78px,.42fr);align-items:center;gap:10px;padding:10px 14px}
+.sheet-head{background:#fafbfc;border-bottom:1px solid var(--line);font-size:10px;letter-spacing:.055em;text-transform:uppercase;color:var(--muted);font-weight:750}
+.assessment{border-bottom:1px solid var(--line);min-height:64px}
+.assessment:last-child{border-bottom:0}
+.name{font-weight:750;font-size:13px}
+.meta{font-size:11px;color:var(--muted);margin-top:2px}
+.prof{font-size:10px;color:var(--muted);display:block;margin-top:2px}
+label{display:block;font-size:10px;color:var(--muted);margin:0 0 4px}
+input{width:100%;min-width:0;border:1px solid #dfe3eb;border-radius:8px;background:#fff;color:var(--ink);padding:8px 9px;font:inherit;font-size:13px;outline:none;font-variant-numeric:tabular-nums}
+input:focus{border-color:var(--blue);box-shadow:0 0 0 2px #3559d81a}
+input::placeholder{color:#a7afbc}
+.weightbox{position:relative}.weightbox input{padding-right:23px}.pct{position:absolute;right:9px;top:8px;color:var(--muted);font-size:12px;pointer-events:none}
+.bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+.note{font-size:11px;color:var(--muted);margin:0;max-width:570px}
+.actions{display:flex;gap:7px;flex-shrink:0}
+button{font:inherit;font-size:11px;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:8px 10px;cursor:pointer}
+button:hover{background:#f4f6fa}
+button.primary-btn{background:var(--blue);border-color:var(--blue);color:#fff}
+button.primary-btn:hover{background:#2949c2}
+.status{font-size:11px;color:var(--muted);margin-top:7px;min-height:15px}
+.status.warning{color:#a15c00}
+.progress{height:3px;background:#e8ecf4;margin-top:8px;border-radius:9px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--blue);transition:width .15s}
+@media(min-height:760px) and (min-width:601px){main{padding-top:5vh}}
+@media(max-width:600px){
+ main{width:calc(100% - 16px);padding:12px 0 18px}
+ header{margin-bottom:10px}
+ .sub{font-size:11px}
+ .tag{font-size:10px;padding:5px 6px}
+ .summary{gap:6px;margin-bottom:8px}
+ .metric{padding:9px 10px;border-radius:10px}
+ .kicker{font-size:10px}.value{font-size:21px}.caption{font-size:10px}
+ .sheet{border-radius:11px}
+ .sheet-head,.assessment{grid-template-columns:minmax(88px,1.1fr) minmax(66px,.8fr) minmax(65px,.75fr) minmax(62px,.7fr);gap:6px;padding:9px 8px}
+ .sheet-head{font-size:9px;letter-spacing:0}
+ .assessment{min-height:59px}
+ .name{font-size:12px}.meta{font-size:10px}.prof{font-size:9px}
+ label{font-size:9px;margin-bottom:3px}
+ input{font-size:12px;padding:8px 6px;border-radius:7px}
+ .weightbox input{padding-right:18px}.pct{right:6px;top:8px;font-size:10px}
+ .bottom{align-items:flex-start;flex-direction:column;margin-top:8px;gap:7px}
+ .note{font-size:10px}
+ button{padding:8px 10px}
+}
+@media(max-width:350px){
+ .sheet-head,.assessment{grid-template-columns:minmax(76px,1fr) minmax(58px,.8fr) minmax(56px,.75fr) minmax(55px,.7fr);gap:4px;padding-left:6px;padding-right:6px}
+ input{padding-left:4px;padding-right:4px}
+ .weightbox input{padding-right:16px}
+}
+
+/* Refinamento visual: superfícies leves, sem grelha nem contornos redundantes */
+:root{--bg:#fbfcfe;--card:#fff;--ink:#202638;--muted:#7b8494;--line:#edf0f5;--blue:#3858d8;--bluebg:#f0f3ff}
+body{background:var(--bg);letter-spacing:-.012em}
+main{width:min(100% - 28px,800px);padding:clamp(16px,4vh,34px) 0 24px}
+header{margin-bottom:18px}
+h1{font-size:clamp(21px,3.5vw,28px);font-weight:760;letter-spacing:-.055em}
+.sub{font-size:12px;letter-spacing:0}
+.tag{border:0;background:#f0f2f7;border-radius:7px}
+.summary{gap:10px;margin-bottom:15px}
+.metric{border:0;border-radius:12px;background:#f1f3f7;padding:13px 15px}
+.metric.primary{background:var(--bluebg);border:0}
+.kicker{font-size:10px;letter-spacing:.055em}
+.value{font-size:clamp(20px,4vw,28px);margin-top:4px}
+.sheet{border:0;border-radius:0;background:transparent;overflow:visible}
+.sheet-head{background:transparent;border:0;padding:0 12px 7px}
+.assessment{border:0;border-radius:12px;background:#fff;margin-bottom:5px;padding:10px 12px;min-height:66px;box-shadow:0 1px 2px rgba(20,35,70,.025)}
+.assessment:last-child{margin-bottom:0}
+.name{font-size:13px;letter-spacing:-.025em}
+.meta{font-size:10px;line-height:1.3;color:#697487;margin-top:3px;max-width:250px}
+.prof{font-size:10px;color:#939bab;margin-top:3px}
+label{font-size:10px;letter-spacing:.01em;margin-bottom:4px}
+input{border:1px solid transparent;background:#f5f6f9;border-radius:8px;padding:9px 9px;font-size:13px;transition:background .15s,border-color .15s,box-shadow .15s}
+input:hover{background:#f0f2f7}
+input:focus{background:#fff;border-color:#cbd5ff;box-shadow:0 0 0 3px #3858d80d}
+.weightbox input{padding-right:22px}
+.pct{top:9px;color:#9098a7}
+.progress{margin-top:10px;background:#edf0f6;height:3px}
+.fill{background:var(--blue)}
+.status{font-size:11px;margin:8px 12px 0}
+.bottom{margin-top:13px;padding:0 2px}
+.note{font-size:10px;line-height:1.5}
+button{border:0;background:#f0f2f7;border-radius:8px;padding:9px 12px;transition:background .15s}
+button:hover{background:#e7eaf1}
+button.primary-btn{background:var(--blue);color:white}
+button.primary-btn:hover{background:#2949c2}
+@media(min-width:601px){
+ .assessment{grid-template-columns:minmax(0,1fr) minmax(100px,.55fr) minmax(78px,.42fr);min-height:70px}
+ .sheet-head{grid-template-columns:minmax(210px,1.8fr) minmax(90px,.8fr) minmax(86px,.75fr) minmax(82px,.7fr)}
+}
+@media(max-width:600px){
+ main{width:calc(100% - 16px);padding:13px 0 18px}
+ header{margin-bottom:12px}
+ .summary{gap:6px;margin-bottom:11px}
+ .metric{padding:10px 9px;border-radius:10px}
+ .value{font-size:20px}
+ .sheet-head,.assessment{grid-template-columns:minmax(0,1fr) minmax(76px,.62fr) minmax(66px,.48fr);gap:5px;padding-left:7px;padding-right:7px}
+ .sheet-head{padding-bottom:6px}
+ .assessment{min-height:64px;margin-bottom:5px}
+ .name{font-size:11px}
+ .meta{font-size:9px;line-height:1.25;max-width:145px}
+ .prof{font-size:9px}
+ label{font-size:9px}
+ input{font-size:12px;padding:8px 5px}
+ .weightbox input{padding-right:16px}
+ .pct{right:5px;top:8px;font-size:10px}
+ .bottom{gap:8px}
+}
+@media(max-width:360px){
+ .sheet-head,.assessment{grid-template-columns:minmax(0,1fr) minmax(68px,.62fr) minmax(58px,.48fr);gap:4px;padding-left:5px;padding-right:5px}
+ .meta{font-size:8.5px}
+ input{padding-left:4px;padding-right:4px}
+ .weightbox input{padding-right:15px}
+}
+
+
+/* Hierarquia visual: média e números principais em primeiro plano */
+.metric.primary{padding:16px 18px;background:#edf1ff}
+.metric.primary .value{font-size:clamp(30px,5vw,40px);font-weight:850;line-height:1.08;letter-spacing:-.065em}
+.metric:not(.primary) .value{font-size:clamp(23px,4vw,30px);font-weight:800;line-height:1.1;letter-spacing:-.05em}
+.kicker{font-size:10px;font-weight:800;letter-spacing:.075em}
+.metric.primary .kicker{color:#4c61b6}
+.metric.primary .caption{color:#6878ba}
+.sheet-head{font-size:10px;font-weight:800}
+.assessment .name{font-size:14px;font-weight:780}
+.assessment .meta{font-size:11px}
+.assessment .prof{font-size:10px}
+.assessment input{font-size:15px;font-weight:650;font-variant-numeric:tabular-nums}
+.assessment input.grade{font-size:16px;font-weight:750}
+.assessment input.max{font-size:14px;font-weight:650;color:#626d80}
+.assessment input.weight{font-size:16px;font-weight:800;color:#304fc5;background:#f0f3ff}
+.assessment .weightbox .pct{font-weight:700;color:#5269c6}
+@media(max-width:600px){
+ .metric.primary{padding:12px 10px}
+ .metric.primary .value{font-size:clamp(27px,7vw,34px)}
+ .metric:not(.primary) .value{font-size:clamp(20px,5.2vw,25px)}
+ .assessment .name{font-size:12px}
+ .assessment .meta{font-size:9px}
+ .assessment input{font-size:13px}
+ .assessment input.grade,.assessment input.weight{font-size:14px;font-weight:800}
+ .assessment input.max{font-size:12px}
+}
+
+
+/* Hierarquia minimalista: média > nota > peso; nota máxima apenas informativa */
+.summary{grid-template-columns:minmax(0,1fr) minmax(100px,.28fr);align-items:stretch;gap:10px}
+.metric.primary{padding:17px 20px;background:#eef2ff;border-radius:13px}
+.metric.primary .value{font-size:clamp(36px,6vw,48px);line-height:1.02;font-weight:850;letter-spacing:-.07em;margin-top:5px}
+.metric.primary .kicker{font-size:10px;letter-spacing:.09em}
+.metric.primary .caption{font-size:10px;margin-top:5px}
+.weight-summary{padding:13px 12px;display:flex;flex-direction:column;justify-content:center;background:#f1f3f7;border-radius:13px}
+.weight-summary .value{font-size:clamp(17px,2.5vw,22px);font-weight:700;color:#65708a;letter-spacing:-.045em}
+.sheet-head{grid-template-columns:minmax(0,1fr) minmax(100px,.55fr) minmax(78px,.42fr)}
+.assessment{grid-template-columns:minmax(0,1fr) minmax(100px,.55fr) minmax(78px,.42fr);padding:11px 12px;min-height:70px}
+.assessment-info{min-width:0}
+.assessment .name{font-size:14px}
+.assessment .meta{font-size:11px}
+.assessment .prof{font-size:10px}
+.assessment .max-note{font-size:10px;color:#9aa2b0;margin-top:3px}
+.assessment input.grade{font-size:20px;font-weight:800;letter-spacing:-.04em;padding:8px 10px;background:#f3f5fa}
+.assessment input.weight{font-size:14px;font-weight:700;color:#65708a;background:#f5f6f9;padding:8px 7px}
+.assessment .pct{font-size:11px;color:#8a93a3;top:9px}
+@media(max-width:600px){
+ .summary{grid-template-columns:minmax(0,1fr) minmax(75px,.32fr);gap:7px}
+ .metric.primary{padding:13px 12px}
+ .metric.primary .value{font-size:clamp(34px,9vw,42px)}
+ .weight-summary{padding:10px 8px}
+ .weight-summary .value{font-size:17px}
+ .sheet-head,.assessment{grid-template-columns:minmax(0,1fr) minmax(68px,.62fr) minmax(58px,.48fr);gap:7px;padding-left:8px;padding-right:8px}
+ .assessment{min-height:68px}
+ .assessment .name{font-size:12px}
+ .assessment .meta{font-size:9px}
+ .assessment .prof,.assessment .max-note{font-size:9px}
+ .assessment input.grade{font-size:18px;padding:8px 6px}
+ .assessment input.weight{font-size:13px;padding:8px 5px}
+ .assessment .pct{right:5px;font-size:10px}
+}
+@media(max-width:360px){
+ .sheet-head,.assessment{grid-template-columns:minmax(0,1fr) minmax(61px,.62fr) minmax(53px,.48fr);gap:5px;padding-left:6px;padding-right:6px}
+ .assessment input.grade{font-size:16px}
+ .assessment .meta{font-size:8.5px}
+}
+
+
+/* Compactação final */
+main{width:min(100% - 24px,760px);padding:clamp(12px,2.5vh,24px) 0 18px}
+header{margin-bottom:12px}
+h1{font-size:clamp(20px,3vw,25px)}
+.summary{margin-bottom:10px;gap:8px}
+.metric.primary{padding:13px 16px}
+.metric.primary .value{font-size:clamp(35px,5.5vw,44px)}
+.weight-summary{padding:10px 12px}
+.sheet-head{padding:0 10px 5px;font-size:10px}
+.sheet-head,.assessment{grid-template-columns:minmax(0,1fr) minmax(100px,.48fr) minmax(76px,.36fr);gap:9px}
+.assessment{padding:8px 10px;min-height:57px;margin-bottom:3px}
+.assessment .name{font-size:13px}
+.assessment .meta{font-size:10px;margin-top:2px}
+.assessment .prof{font-size:9px;margin-top:1px}
+.scale-note{font-size:9px;color:#a0a7b4;font-weight:600;letter-spacing:0}
+.assessment input.grade{font-size:18px;padding:7px 9px}
+.assessment input.weight{font-size:13px;padding:7px 6px}
+.progress{margin-top:7px}
+.status{margin-top:6px}
+.bottom{margin-top:9px}
+.note{max-width:490px}
+@media(max-width:600px){
+ main{width:calc(100% - 14px);padding:11px 0 14px}
+ header{margin-bottom:10px}
+ .summary{gap:6px;margin-bottom:8px}
+ .metric.primary{padding:11px 10px}
+ .metric.primary .value{font-size:clamp(32px,8.5vw,39px)}
+ .weight-summary{padding:9px 7px}
+ .weight-summary .value{font-size:16px}
+ .sheet-head,.assessment{grid-template-columns:minmax(0,1fr) minmax(65px,.55fr) minmax(55px,.42fr);gap:6px;padding-left:7px;padding-right:7px}
+ .sheet-head{padding-bottom:5px}
+ .assessment{min-height:55px;padding-top:7px;padding-bottom:7px;margin-bottom:3px}
+ .assessment .name{font-size:12px}
+ .assessment .meta{font-size:9px;line-height:1.2}
+ .assessment .prof{font-size:9px}
+ .assessment input.grade{font-size:17px;padding:7px 5px}
+ .assessment input.weight{font-size:12px;padding:7px 4px}
+ .scale-note{font-size:8px}
+ .bottom{margin-top:8px}
+}
+@media(max-width:350px){
+ .sheet-head,.assessment{grid-template-columns:minmax(0,1fr) minmax(58px,.55fr) minmax(51px,.42fr);gap:4px;padding-left:5px;padding-right:5px}
+ .assessment input.grade{font-size:15px}
+}
+
+/* Acabamento visual para a versão de publicação */
+:root{--bg:#f6f7fb;--card:#fff;--ink:#202638;--muted:#737d90;--line:#e9ecf3;--blue:#3858d8;--bluebg:#eef2ff}
+body{background:radial-gradient(ellipse at 50% -180px,#e9edff 0,transparent 620px),var(--bg)}
+main{width:min(100% - 28px,760px);padding:clamp(18px,5vh,48px) 0 28px}
+header{align-items:flex-start;margin-bottom:20px}
+.tag{background:#fff;box-shadow:0 1px 3px #1725540a}
+.metric{box-shadow:0 2px 8px #17255408}
+.metric.primary{background:linear-gradient(135deg,#f0f3ff,#e9eeff)}
+.weight-summary{background:#fff;box-shadow:0 2px 8px #17255408}
+.assessment{box-shadow:0 2px 8px #17255408;transition:box-shadow .15s,transform .15s}
+.assessment:focus-within{box-shadow:0 4px 14px #3858d81a}
+button{transition:transform .12s,background .15s,box-shadow .15s}
+button:active{transform:translateY(1px)}
+button.primary-btn{box-shadow:0 2px 6px #3858d82b}
+.status.warning{color:#9a5700}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+
+</style>
+</head>
+<body>
+<main>
+<header>
+ <div><h1>Média ponderada</h1><div class="sub">Genética Molecular <span aria-hidden="true">·</span> Configuração #39648</div></div>
+ <span class="tag">Notas de 0 a 100</span>
+</header>
+<section class="summary" aria-label="Resumo da média">
+ <div class="metric primary"><div class="kicker">MÉDIA ATUAL</div><div class="value" id="average">—</div><div class="caption" id="completed">0/5 notas preenchidas</div></div>
+ <div class="metric weight-summary"><div class="kicker">PESOS</div><div class="value" id="total-weight">100%</div></div>
+</section>
+<section class="sheet" aria-label="Notas das avaliações">
+ <div class="sheet-head"><div>Avaliação</div><div>Nota <span class="scale-note">/ 100</span></div><div>Peso</div></div>
+ <div class="assessment" data-id="p1" data-max="100">
+  <div class="assessment-info"><div class="name">P1 · Prova</div><div class="meta">Introdução à Genética Molecular · DNA e replicação em procariotos</div><div class="prof">Prof. Alexandre</div></div><div><label for="g-p1">Sua nota</label><input id="g-p1" class="grade" type="number" min="0" max="100" step="1" placeholder="—" inputmode="decimal"></div><div><label for="w-p1">Peso</label><div class="weightbox"><input id="w-p1" class="weight" type="number" min="0" max="100" step="1" value="20" inputmode="decimal"><span class="pct">%</span></div></div>
+ </div>
+ <div class="assessment" data-id="p2" data-max="100">
+  <div class="assessment-info"><div class="name">P2 · Prova</div><div class="meta">Transcrição em procariotos</div><div class="prof">Prof. Alexandre</div></div><div><label for="g-p2">Sua nota</label><input id="g-p2" class="grade" type="number" min="0" max="100" step="1" placeholder="—" inputmode="decimal"></div><div><label for="w-p2">Peso</label><div class="weightbox"><input id="w-p2" class="weight" type="number" min="0" max="100" step="1" value="20" inputmode="decimal"><span class="pct">%</span></div></div>
+ </div>
+ <div class="assessment" data-id="p3" data-max="100">
+  <div class="assessment-info"><div class="name">P3 · Prova</div><div class="meta">Tradução em procariotos</div><div class="prof">Prof. Wilson</div></div><div><label for="g-p3">Sua nota</label><input id="g-p3" class="grade" type="number" min="0" max="100" step="1" placeholder="—" inputmode="decimal"></div><div><label for="w-p3">Peso</label><div class="weightbox"><input id="w-p3" class="weight" type="number" min="0" max="100" step="1" value="20" inputmode="decimal"><span class="pct">%</span></div></div>
+ </div>
+ <div class="assessment" data-id="p4" data-max="100">
+  <div class="assessment-info"><div class="name">P4 · Prova</div><div class="meta">Assunto não informado</div><div class="prof">Prof. Wilson</div></div><div><label for="g-p4">Sua nota</label><input id="g-p4" class="grade" type="number" min="0" max="100" step="1" placeholder="—" inputmode="decimal"></div><div><label for="w-p4">Peso</label><div class="weightbox"><input id="w-p4" class="weight" type="number" min="0" max="100" step="1" value="20" inputmode="decimal"><span class="pct">%</span></div></div>
+ </div>
+ <div class="assessment" data-id="a5" data-max="100">
+  <div class="assessment-info"><div class="name">A5 · Trabalho</div><div class="meta">Assunto não informado</div><div class="prof">Prof. Wilson</div></div><div><label for="g-a5">Sua nota</label><input id="g-a5" class="grade" type="number" min="0" max="100" step="1" placeholder="—" inputmode="decimal"></div><div><label for="w-a5">Peso</label><div class="weightbox"><input id="w-a5" class="weight" type="number" min="0" max="100" step="1" value="20" inputmode="decimal"><span class="pct">%</span></div></div>
+ </div>
+</section>
+<div class="progress"><div class="fill" id="progress"></div></div>
+<div class="status" id="status" aria-live="polite">Preencha as notas para calcular sua média.</div>
+<div class="bottom">
+ <p class="note">Pesos editáveis. Se a soma for diferente de 100%, os pesos serão normalizados no cálculo. As notas são processadas neste dispositivo.</p>
+ <div class="actions"><button id="example" class="primary-btn" type="button">Exemplo</button><button id="reset" type="button">Limpar</button></div>
+</div>
+</main>
+<script>
+(()=>{
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)], cards=$$('.assessment');
+const val=e=>{const s=String(e.value??'').trim().replace(',','.');return s===''?NaN:Number(s)};
+const fmt=(n,d=2)=>n.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+function calc(){
+ let sum=0,ws=0,filled=0,invalid=false;
+ cards.forEach(c=>{
+  const g=$('.grade',c),w=$('.weight',c),gv=val(g),mv=Number(c.dataset.max||100),wv=val(w);
+  [g,w].forEach(e=>e.setCustomValidity(''));
+  if(Number.isFinite(wv)&&wv<0){w.setCustomValidity('O peso não pode ser negativo.');invalid=true}
+  if(Number.isFinite(gv)){
+   filled++;
+   if(gv<0||(Number.isFinite(mv)&&mv>0&&gv>mv)){g.setCustomValidity('Use uma nota entre zero e a nota máxima.');invalid=true}
+   
+  }
+  if(Number.isFinite(gv)&&Number.isFinite(wv)&&wv>=0&&gv>=0&&gv<=mv){sum+=(gv/mv)*wv;ws+=wv}
+ });
+ const total=cards.reduce((s,c)=>{const w=val($('.weight',c));return s+(Number.isFinite(w)&&w>=0?w:0)},0);
+$('#completed').textContent=`${filled}/${cards.length} notas preenchidas`;$('#total-weight').textContent=fmt(total,0)+'%';
+ if(invalid){$('#average').textContent='—';$('#status').textContent='Confira os campos: há valores fora dos limites permitidos.';$('#status').className='status warning';$('#progress').style.width='0%';return}
+ if(ws<=0){$('#average').textContent='—';$('#status').textContent='Informe pesos maiores que zero.';$('#status').className='status warning';$('#progress').style.width='0%';return}
+ const avg=sum/ws*100;
+ $('#average').textContent=filled?fmt(avg):'—';$('#progress').style.width=`${Math.max(0,Math.min(100,avg))}%`;
+ let msg=filled?'Média proporcional calculada na escala de 0 a 100.':'Preencha as notas para calcular sua média.';
+ if(Math.abs(total-100)>.001)msg+=` Pesos normalizados (${fmt(total,0)}% no total).`;
+ $('#status').textContent=msg;$('#status').className='status';
+}
+$('#assessments')?.addEventListener('input',calc);
+$$('input').forEach(e=>e.addEventListener('input',calc));
+$('#reset').addEventListener('click',()=>{$$('.grade').forEach(e=>e.value='');calc()});
+$('#example').addEventListener('click',()=>[80,75,90,65,100].forEach((v,i)=>{if($$('.grade')[i])$$('.grade')[i].value=v;calc()}));
+calc();
+})();
+</script>
+</body>
+</html>
